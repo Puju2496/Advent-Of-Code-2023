@@ -1,17 +1,62 @@
+import java.io.File
+
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.size
+    val input = File("src", "Day01.txt").readLines()
+
+    fun part1(inputs: List<String>): Int {
+        val intList = inputs.map { input ->
+            val list = input.filter { it.isDigit() }
+            "${list.first()}${list.last()}".toInt()
+        }
+        val sum = intList.fold(0) { r, t ->
+            r + t
+        }
+        return sum
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
+    val numberStrings = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
+
+    fun part2(inputs: List<String>): Int {
+        var sum = 0
+        inputs.forEach { input ->
+            val digitList = input.filter { it.isDigit() }
+            val firstDigit = digitList.first()
+            val lastDigit = digitList.last()
+
+            val firstDigitIndex = input.indexOf(firstDigit)
+            val lastDigitIndex = input.lastIndexOf(lastDigit)
+
+            val containsStrings = mutableMapOf<Int, List<Int>>()
+            numberStrings.forEachIndexed { index, it ->
+                if (it in input) {
+                    val list = mutableListOf<Int>()
+                    var checkIndex = input.indexOf(it, ignoreCase = true)
+                    list.add(input.indexOf(it, ignoreCase = true))
+                    var newInput = input.replaceFirst(it, "")
+                    while (it in newInput) {
+                        list.add(input.indexOf(it, startIndex = checkIndex + it.length, ignoreCase = true))
+                        checkIndex = input.indexOf(it, startIndex = checkIndex + it.length, ignoreCase = true)
+                        newInput = newInput.replaceFirst(it, "")
+                    }
+                    containsStrings[index+1] = list
+                }
+            }
+            val valuesList = mutableListOf<Int>()
+            containsStrings.forEach {
+                valuesList.addAll(it.value)
+            }
+            val minString = valuesList.minOrNull()
+            val maxString = valuesList.maxOrNull()
+
+            val first = if (minString != null && minString <= firstDigitIndex) containsStrings.filter { it.value.contains(minString) }.keys.first().toString() else  firstDigit.toString()
+            val last = if (maxString != null && maxString >= lastDigitIndex) containsStrings.filter { it.value.contains(maxString) }.keys.first().toString() else lastDigit.toString()
+
+            sum += "$first$last".toInt()
+        }
+
+        return sum
     }
 
-    // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
-
-    val input = readInput("Day01")
-    part1(input).println()
-    part2(input).println()
+    println(part1(input))
+    println(part2(input))
 }
