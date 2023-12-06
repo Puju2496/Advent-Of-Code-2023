@@ -1,7 +1,10 @@
-import java.io.File
+package day01
+
+import println
+import readInput
 
 fun main() {
-    val input = File("src", "Day01.txt").readLines()
+    val input = readInput("day01/Day01")
 
     fun part1(inputs: List<String>): Int {
         val intList = inputs.map { input ->
@@ -57,6 +60,6 @@ fun main() {
         return sum
     }
 
-    println(part1(input))
-    println(part2(input))
+    part1(input).println()
+    part2(input).println()
 }
