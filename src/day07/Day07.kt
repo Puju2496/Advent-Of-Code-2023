@@ -6,22 +6,26 @@ import readInput
 fun main() {
     val inputs = readInput("day07/Day07")
 
+    fun Map<Char, Int>.getCardType(length: Int): CardTypes {
+        return when {
+            size == 1 && all { it.value == 5 } -> CardTypes.FIVE_KIND
+            size == 2 && any { it.value == 4 } && any { it.value == 1 } -> CardTypes.FOUR_KIND
+            size == 2 && any { it.value == 3 } && any { it.value == 2 } -> CardTypes.FULL_HOUSE
+            size == 3 && any { it.value == 3 } && filter { it.value == 1 }.count() == 2 -> CardTypes.THREE_KIND
+            size == 3 && filter { it.value == 2 }.count() == 2 && filter { it.value == 1 }.count() == 1 -> CardTypes.TWO_PAIR
+            size == 4 && filter { it.value == 2 }.count() == 1 && filter { it.value == 1 }.count() == 3 -> CardTypes.ONE_PAIR
+            size == length -> CardTypes.HIGH_CARD
+            else -> CardTypes.UNKNOWN
+        }
+    }
+
     fun part1(inputs: List<String>): Int {
         val cardsMap = inputs.map { input ->
             val cardData = input.split(" ")
-                val card = cardData[0].trim()
-                val sequence = card.groupingBy { char -> char }.eachCount()
-                val type = when {
-                    sequence.size == 1 && sequence.all { it.value == 5 } -> CardTypes.FIVE_KIND
-                    sequence.size == 2 && sequence.any { it.value == 4 } && sequence.any { it.value == 1 } -> CardTypes.FOUR_KIND
-                    sequence.size == 2 && sequence.any { it.value == 3 } && sequence.any { it.value == 2 } -> CardTypes.FULL_HOUSE
-                    sequence.size == 3 && sequence.any { it.value == 3 } && sequence.filter { it.value == 1 }.count() == 2-> CardTypes.THREE_KIND
-                    sequence.size == 3 && sequence.filter { it.value == 2 }.count() == 2 && sequence.filter { it.value == 1 }.count() == 1 -> CardTypes.TWO_PAIR
-                    sequence.size == 4 && sequence.filter { it.value == 2 }.count() == 1 && sequence.filter { it.value == 1 }.count() == 3 -> CardTypes.ONE_PAIR
-                    sequence.size == card.length -> CardTypes.HIGH_CARD
-                    else -> CardTypes.UNKNOWN
-                }
-                Card(card, cardData[1].trim().toInt(), type, label1)
+            val card = cardData[0].trim()
+            val sequence = card.groupingBy { char -> char }.eachCount()
+            val type = sequence.getCardType(card.length)
+            Card(card, cardData[1].trim().toInt(), type, label1)
         }
 
         return cardsMap.sorted().mapIndexed { index, card ->
@@ -42,17 +46,7 @@ fun main() {
                 card.replace('J', maxKey)
             }.groupingBy { it }.eachCount()
 
-            val type = when {
-                sequence.all { it.key == 'J' } -> CardTypes.FIVE_KIND
-                sequence.size == 1 && sequence.all { it.value == 5 } -> CardTypes.FIVE_KIND
-                sequence.size == 2 && sequence.any { it.value == 4 } && sequence.any { it.value == 1 } -> CardTypes.FOUR_KIND
-                sequence.size == 2 && sequence.any { it.value == 3 } && sequence.any { it.value == 2 } -> CardTypes.FULL_HOUSE
-                sequence.size == 3 && sequence.any { it.value == 3 } && sequence.filter { it.value == 1 }.count() == 2 -> CardTypes.THREE_KIND
-                sequence.size == 3 && sequence.filter { it.value == 2 }.count() == 2 && sequence.filter { it.value == 1 }.count() == 1 -> CardTypes.TWO_PAIR
-                sequence.size == 4 && sequence.filter { it.value == 2 }.count() == 1 && sequence.filter { it.value == 1 }.count() == 3 -> CardTypes.ONE_PAIR
-                sequence.size == card.length -> CardTypes.HIGH_CARD
-                else -> CardTypes.UNKNOWN
-            }
+            val type = sequence.getCardType(card.length)
             Card(card, cardData[1].trim().toInt(), type, label2)
         }
 
@@ -65,7 +59,7 @@ fun main() {
     part2(inputs).println()
 }
 
-data class Card(val name: String, val amount: Int, val cardType: CardTypes, val label: List<Char>): Comparable<Card> {
+data class Card(val name: String, val amount: Int, val cardType: CardTypes, val label: List<Char>) : Comparable<Card> {
 
     override fun compareTo(other: Card): Int {
         return when {
@@ -80,6 +74,7 @@ data class Card(val name: String, val amount: Int, val cardType: CardTypes, val 
 
                 return 0
             }
+
             else -> {
                 cardType.priority.compareTo(other.cardType.priority)
             }

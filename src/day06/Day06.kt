@@ -34,7 +34,6 @@ fun main() {
         val time = inputs[0].substringAfter(":").filter { !it.isWhitespace() }.toLong()
         val distance = inputs[1].substringAfter(":").filter { !it.isWhitespace() }.toLong()
 
-
         return (2 until time).map {
             val remainingTime = time - it
             val coveredDistance = remainingTime * it

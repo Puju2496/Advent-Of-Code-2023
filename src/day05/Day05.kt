@@ -35,15 +35,18 @@ fun main() {
 
     fun part1(inputs: List<String>): Long {
         val list = inputs.map { input ->
-            input.filter { !it.isLetter() && !SPECIAL_CHARACTER.matches(it.toString()) }.trim().split(" ").map { it.toLongOrNull() ?: -1 }
+            input.filter { !it.isLetter() && !SPECIAL_CHARACTER.matches(it.toString()) }.trim().split(" ")
+                .map { it.toLongOrNull() ?: -1 }
         }.mapIndexed { index, longs ->
             when {
                 index != 0 && longs.size > 1 -> {
                     Pair(LongRange(longs[0], longs[0] + longs[2]), LongRange(longs[1], longs[1] + longs[2]))
                 }
+
                 index == 0 -> {
-                   longs
+                    longs
                 }
+
                 else -> {
                     -1
                 }
@@ -57,7 +60,7 @@ fun main() {
         repeat(7) {
             val startIndex = (endIndexes[endIndex] + 1).takeIf { it <= list.lastIndex } ?: list.lastIndex
             val nextEndIndex = (endIndex + 2).takeIf { it <= list.lastIndex } ?: list.lastIndex
-            val subEndIndex = if(nextEndIndex <= endIndexes.lastIndex) endIndexes[nextEndIndex] - 1 else list.lastIndex
+            val subEndIndex = if (nextEndIndex <= endIndexes.lastIndex) endIndexes[nextEndIndex] - 1 else list.lastIndex
             seeds = getMapped(list.subList(startIndex, subEndIndex) as List<Pair<LongRange, LongRange>>, seeds)
             endIndex = nextEndIndex
         }

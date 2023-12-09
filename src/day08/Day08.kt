@@ -7,20 +7,24 @@ import kotlin.math.max
 fun main() {
     val inputs = readInput("day08/Day08")
 
+    fun getMappedNetwork(inputs: List<String>): Map<String, Set<String>> {
+        return inputs.subList(2, inputs.size).associate { input ->
+            val data = input.split("=", "(", ",", ")").map { it.trim() }
+            data[0] to setOf(data[2], data[3])
+        }
+    }
+
     fun part1(inputs: List<String>): Int {
         val direction = inputs[0]
         var index = 0
 
-        val network = inputs.subList(2, inputs.size).associate { input ->
-            val data = input.split("=", "(", ",", ")").map { it.trim() }
-            data[0] to setOf(data[2], data[3])
-        }
+        val network = getMappedNetwork(inputs)
 
         var start = "AAA"
 
         var count = 0
         while (start != "ZZZ") {
-            val next = when(direction[index]) {
+            val next = when (direction[index]) {
                 'L' -> network[start]?.first()
                 else -> network[start]?.last()
             }
@@ -36,10 +40,7 @@ fun main() {
     fun part2(inputs: List<String>): Long {
         val direction = inputs[0]
 
-        val network = inputs.subList(2, inputs.size).associate { input ->
-            val data = input.split("=", "(", ",", ")").map { it.trim() }
-            data[0] to setOf(data[2], data[3])
-        }
+        val network = getMappedNetwork(inputs)
 
         val start = network.keys.filter { it.last() == 'A' }
 
@@ -50,10 +51,10 @@ fun main() {
             var count = 0L
 
             while (dest.last() != 'Z') {
-              val next = when (direction[index]) {
-                  'L' -> network[dest]?.first()
-                  else -> network[dest]?.last()
-              }
+                val next = when (direction[index]) {
+                    'L' -> network[dest]?.first()
+                    else -> network[dest]?.last()
+                }
                 index = (index + 1) % direction.length
                 dest = next.orEmpty()
                 count++

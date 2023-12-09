@@ -23,22 +23,12 @@ fun main() {
 
     fun part1(): Int {
         return symbols.map { symbolPosition ->
-            val (row, col, _) = symbolPosition
-            val list = listOf(
-                Position(row - 1, col - 1),
-                Position(row - 1, col + 1),
-                Position(row + 1, col - 1),
-                Position(row + 1, col + 1),
-                Position(row, col + 1),
-                Position(row, col - 1),
-                Position(row - 1, col),
-                Position(row + 1, col)
-            )
-                numbers.filter { numberPosition ->
-                    numberPosition.numberRange().any {
-                        list.contains(it)
-                    }
+            val list = symbolPosition.allPossiblePositions()
+            numbers.filter { numberPosition ->
+                numberPosition.numberRange().any {
+                    list.contains(it)
                 }
+            }
         }.flatten()
             .sumOf { it.num }
 
@@ -46,17 +36,7 @@ fun main() {
 
     fun part2(): Int {
         return symbols.filter { it.symbol == '*' }.map { symbolPosition ->
-            val (row, col, _) = symbolPosition
-            val list = listOf(
-                Position(row, col + 1),
-                Position(row, col - 1),
-                Position(row + 1, col),
-                Position(row - 1, col),
-                Position(row + 1, col + 1),
-                Position(row - 1, col + 1),
-                Position(row + 1, col - 1),
-                Position(row - 1, col - 1)
-            )
+            val list = symbolPosition.allPossiblePositions()
 
             numbers.filter { numberPosition ->
                 numberPosition.numberRange().any {
@@ -86,7 +66,18 @@ data class NumberPosition(val row: Int, val col: Int, val num: Int) {
     }
 }
 
-data class SymbolPosition(val row: Int, val col: Int, val symbol: Char)
+data class SymbolPosition(val row: Int, val col: Int, val symbol: Char) {
+    fun allPossiblePositions() = listOf(
+        Position(row, col + 1),
+        Position(row, col - 1),
+        Position(row + 1, col),
+        Position(row - 1, col),
+        Position(row + 1, col + 1),
+        Position(row - 1, col + 1),
+        Position(row + 1, col - 1),
+        Position(row - 1, col - 1)
+    )
+}
 data class Position(val row: Int, val col: Int)
 
 private val DIGIT_REGEX = "\\d+".toRegex()
